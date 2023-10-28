@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="Alert-EndIfu.png"><SubTexture name="Alert-EndIfu idle0000" x="0" y="0" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0001" x="880" y="0" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0002" x="1760" y="0" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0003" x="0" y="821" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0004" x="880" y="821" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0005" x="1760" y="821" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0006" x="0" y="1642" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0007" x="880" y="1642" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+<SubTexture name="Alert-EndIfu idle0008" x="1760" y="1642" width="880" height="821" frameX="0" frameY="0" frameWidth="880" frameHeight="821" />
+</TextureAtlas>

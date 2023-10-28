@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="AlertScraperJ.png"><SubTexture name="AlertScraperJ int0000" x="0" y="0" width="79" height="184" frameX="0" frameY="0" frameWidth="79" frameHeight="184" />
+<SubTexture name="AlertScraperJ dest0000" x="79" y="0" width="79" height="184" frameX="0" frameY="0" frameWidth="79" frameHeight="184" />
+<SubTexture name="AlertScraperJ dest0001" x="0" y="184" width="79" height="184" frameX="0" frameY="0" frameWidth="79" frameHeight="184" />
+<SubTexture name="AlertScraperJ dest0002" x="79" y="184" width="79" height="184" frameX="0" frameY="0" frameWidth="79" frameHeight="184" />
+</TextureAtlas>

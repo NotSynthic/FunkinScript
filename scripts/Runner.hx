@@ -9,7 +9,7 @@ function onCreate() {
             if(StringTools.endsWith(file, ".fnf")) new FunkinLua(folder + file);
 
     // STAGE SCRIPTS
-    game.startLuasNamed('stages/' + game.curStage + '.fnf');
+    game.startLuasNamed('stages/' + PlayState.curStage + '.fnf');
 
     // SONG SCRIPTS
     var songFolders:Array<String> = Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/' + game.songName + '/');

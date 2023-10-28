@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="AlertScraperI-fire.png"><SubTexture name="AlertScraperI-fire int0000" x="0" y="0" width="162" height="300" frameX="0" frameY="0" frameWidth="162" frameHeight="300" />
+<SubTexture name="AlertScraperI-fire dest0000" x="162" y="0" width="162" height="300" frameX="0" frameY="0" frameWidth="162" frameHeight="300" />
+<SubTexture name="AlertScraperI-fire dest0001" x="0" y="300" width="162" height="300" frameX="0" frameY="0" frameWidth="162" frameHeight="300" />
+<SubTexture name="AlertScraperI-fire dest0002" x="162" y="300" width="162" height="300" frameX="0" frameY="0" frameWidth="162" frameHeight="300" />
+</TextureAtlas>

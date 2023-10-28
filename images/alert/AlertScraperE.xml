@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<TextureAtlas imagePath="AlertScraperE.png"><SubTexture name="AlertScraperE int0000" x="0" y="0" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0000" x="557" y="0" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0001" x="0" y="929" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0002" x="557" y="929" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0003" x="0" y="1858" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0004" x="557" y="1858" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+<SubTexture name="AlertScraperE dest0005" x="0" y="2787" width="557" height="929" frameX="0" frameY="0" frameWidth="557" frameHeight="929" />
+</TextureAtlas>

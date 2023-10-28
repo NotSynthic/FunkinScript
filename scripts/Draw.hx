@@ -5,7 +5,7 @@ import psychlua.ModchartSprite;
 import backend.CoolUtil;
 
 function onCreate() {
-    createGlobalCallback("sprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+    createGlobalCallback("drawSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
         var leSprite:ModchartSprite = new ModchartSprite(x, y);
 		if(animated) {
             LuaUtils.loadFrames(leSprite, image, spriteType);
@@ -16,13 +16,13 @@ function onCreate() {
 		game.modchartSprites.set(tag, leSprite);
 		if(!animated) leSprite.active = true;
     });
-    createGlobalCallback("graphic", function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
+    createGlobalCallback("drawGraphic", function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
         var leSprite:ModchartSprite = new ModchartSprite(x, y);
         leSprite.makeGraphic(width, height, CoolUtil.colorFromString(color));
         game.modchartSprites.set(tag, leSprite);
         leSprite.active = true;
     });
-    createGlobalCallback("backdrop", function(tag:String, ?image:String = null, ?axes:String = null) {
+    createGlobalCallback("drawBackdrop", function(tag:String, ?image:String = null, ?axes:String = null) {
         var idk;
         switch(axes) {
             case "x": idk = 0x01;
@@ -49,7 +49,7 @@ function onCreate() {
             }
         }
     });
-    createGlobalCallback("scale", function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
+    createGlobalCallback("setScale", function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
         if(game.getLuaObject(obj)!=null) {
             var shit = game.getLuaObject(obj);
             shit.scale.set(x, y);
@@ -68,9 +68,9 @@ function onCreate() {
             if(updateHitbox) poop.updateHitbox();
             return;
         }
-        luaTrace('scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+        luaTrace('setScale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
     });
-    createGlobalCallback("velocity", function(obj:String, x:Float, y:Float) {
+    createGlobalCallback("setVelocity", function(obj:String, x:Float, y:Float) {
         if(game.getLuaObject(obj)!=null) {
             var shit = game.getLuaObject(obj);
             shit.velocity.set(x, y);
@@ -87,9 +87,9 @@ function onCreate() {
             poop.velocity.set(x, y);
             return;
         }
-        FunkinLua.luaTrace('velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+        FunkinLua.luaTrace('setVelocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
     });
-    createGlobalCallback("spriteCenter", function(obj:String, ?pos:String = 'xy') {
+    createGlobalCallback("objectCenter", function(obj:String, ?pos:String = 'xy') {
         var spr = game.getLuaObject(obj);
 
 		if(spr==null){
@@ -115,6 +115,17 @@ function onCreate() {
 					return;
 			}
 		}
-        FunkinLua.luaTrace("spriteCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+        FunkinLua.luaTrace("objectCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+    });
+    createGlobalCallback("objectScrollFactor", function(obj:String, scrollX:Float, scrollY:Float) {
+        if(game.getLuaObject(obj,false)!=null) {
+            game.getLuaObject(obj,false).scrollFactor.set(scrollX, scrollY);
+            return;
+        }
+
+        var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+        if(object != null) {
+            object.scrollFactor.set(scrollX, scrollY);
+        }
     });
 }
