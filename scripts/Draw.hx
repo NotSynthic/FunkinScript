@@ -5,7 +5,7 @@ import psychlua.ModchartSprite;
 import backend.CoolUtil;
 
 function onCreate() {
-    createGlobalCallback("drawSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+    createGlobalCallback("sprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
         var leSprite:ModchartSprite = new ModchartSprite(x, y);
 		if(animated) {
             LuaUtils.loadFrames(leSprite, image, spriteType);
@@ -16,15 +16,13 @@ function onCreate() {
 		game.modchartSprites.set(tag, leSprite);
 		if(!animated) leSprite.active = true;
     });
-
-    createGlobalCallback("drawGraphic", function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
+    createGlobalCallback("graphic", function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
         var leSprite:ModchartSprite = new ModchartSprite(x, y);
         leSprite.makeGraphic(width, height, CoolUtil.colorFromString(color));
         game.modchartSprites.set(tag, leSprite);
         leSprite.active = true;
     });
-
-    createGlobalCallback("drawBackdrop", function(tag:String, ?image:String = null, ?axes:String = null) {
+    createGlobalCallback("backdrop", function(tag:String, ?image:String = null, ?axes:String = null) {
         var idk;
         switch(axes) {
             case "x": idk = 0x01;
@@ -37,7 +35,7 @@ function onCreate() {
         game.modchartSprites.set(tag, spr);
     });
 
-    createGlobalCallback("drawAdd", function(tag:String, ?front:Bool = false) {
+    createGlobalCallback("add", function(tag:String, ?front:Bool = false) {
         if(game.modchartSprites.exists(tag)) {
             var shit = game.modchartSprites.get(tag);
             if(front)
@@ -51,18 +49,7 @@ function onCreate() {
             }
         }
     });
-
-    createGlobalCallback("drawSet", function(variable:String, value:Dynamic, allowMaps:Bool = false) {
-        var split:Array<String> = variable.split('.');
-		if(split.length > 1) {
-			LuaUtils.setVarInArray(LuaUtils.getPropertyLoop(split, true, true, allowMaps), split[split.length-1], value, allowMaps);
-			return true;
-		}
-		LuaUtils.setVarInArray(LuaUtils.getTargetInstance(), variable, value, allowMaps);
-		return true;
-    });
-
-    createGlobalCallback("drawScale", function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
+    createGlobalCallback("scale", function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
         if(game.getLuaObject(obj)!=null) {
             var shit = game.getLuaObject(obj);
             shit.scale.set(x, y);
@@ -81,10 +68,9 @@ function onCreate() {
             if(updateHitbox) poop.updateHitbox();
             return;
         }
-        luaTrace('drawScale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+        luaTrace('scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
     });
-
-    createGlobalCallback("drawVelocity", function(obj:String, x:Float, y:Float) {
+    createGlobalCallback("velocity", function(obj:String, x:Float, y:Float) {
         if(game.getLuaObject(obj)!=null) {
             var shit = game.getLuaObject(obj);
             shit.velocity.set(x, y);
@@ -101,10 +87,9 @@ function onCreate() {
             poop.velocity.set(x, y);
             return;
         }
-        FunkinLua.luaTrace('drawVelocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+        FunkinLua.luaTrace('velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
     });
-
-    createGlobalCallback("drawScreenCenter", function(obj:String, ?pos:String = 'xy') {
+    createGlobalCallback("spriteCenter", function(obj:String, ?pos:String = 'xy') {
         var spr = game.getLuaObject(obj);
 
 		if(spr==null){
@@ -130,6 +115,6 @@ function onCreate() {
 					return;
 			}
 		}
-        FunkinLua.luaTrace("drawScreenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+        FunkinLua.luaTrace("spriteCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
     });
 }

@@ -1,6 +1,6 @@
 function onCreate()
     luaDebugMode = true
-    drawSprite('test', 'sick', 0, 0)
-    drawScreenCenter('test')
-    drawAdd('test', true)
+    sprite('test', 'sick', 0, 0)
+    spriteCenter('test')
+    add('test', true)
 end
