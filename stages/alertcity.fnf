@@ -1,6 +1,4 @@
 function create() {
     draw.sprite('hi', 'sick', 0, 0);
     draw.add('hi');
-
-    system.print('it works!!!');
 }

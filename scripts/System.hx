@@ -5,6 +5,7 @@ import psychlua.ModchartSprite;
 import tea.SScript;
 import backend.CoolUtil;
 
+var skewed:Bool = false;
 var draw = {
 	sprite: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
@@ -214,8 +215,23 @@ function onCreatePost() {
 
 function onUpdate(elapsed) {
 	game.callOnHScript('update', [elapsed]);
+	for (fnf in SScript.global) {
+		fnf.set("mustHit", PlayState.SONG.notes[game.curSection].mustHitSection);
+	}
 }
 
 function onUpdatePost(elapsed) {
 	game.callOnHScript('updatePost', [elapsed]);
+}
+
+function onSectionHit() {
+	game.callOnHScript('sectionHit');
+}
+
+function onStepHit() {
+	game.callOnHScript('stepHit');
+}
+
+function onBeatHit() {
+	game.callOnHScript('beatHit');
 }
