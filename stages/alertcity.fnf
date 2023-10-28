@@ -1,10 +1,5 @@
-function onCreate()
-    luaDebugMode = true
-    drawSprite('test', 'sick', 0, 0)
-    objectCenter('test')
-    add('test', true)
-end
-
-function onCreatePost()
-    set('gf.visible', false)
-end
+function create() {
+    drawSprite('hi', 'sick', 0, 0);
+    drawAdd('hi');
+    systemPrint('it works!!!');
+}
