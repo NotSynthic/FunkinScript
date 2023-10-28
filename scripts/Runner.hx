@@ -17,10 +17,3 @@ function onCreate() {
 		for (file in FileSystem.readDirectory(folder))
 			if(StringTools.endsWith(file, ".fnf")) game.initHScript(folder + file);
 }
-function onCreatePost() {
-    game.callOnHScript('create');
-}
-
-function onUpdatePost(elapsed) {
-    game.callOnHScript('update', [elapsed]);
-}

@@ -204,4 +204,18 @@ function onCreate() {
 		fnf.set("math", math);
 		fnf.set("system", system);
     }
+
+	game.callOnHScript('create');
+}
+
+function onCreatePost() {
+	game.callOnHScript('createPost');
+}
+
+function onUpdate(elapsed) {
+	game.callOnHScript('update', [elapsed]);
+}
+
+function onUpdatePost(elapsed) {
+	game.callOnHScript('updatePost', [elapsed]);
 }
