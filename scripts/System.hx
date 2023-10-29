@@ -1,12 +1,12 @@
+import backend.CoolUtil;
 import flixel.addons.display.FlxBackdrop;
-import psychlua.LuaUtils;
 import psychlua.FunkinLua;
+import psychlua.LuaUtils;
 import psychlua.ModchartSprite;
 import tea.SScript;
-import backend.CoolUtil;
 
 var draw = {
-	sprite: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
         if(animated) {
             LuaUtils.loadFrames(leSprite, image, spriteType);
@@ -17,7 +17,7 @@ var draw = {
         game.modchartSprites.set(tag, leSprite);
         if(!animated) leSprite.active = true;
 	},
-	skewedsprite: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+	skewedimage: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
         if(animated) {
             LuaUtils.loadFrames(leSprite, image, spriteType);
