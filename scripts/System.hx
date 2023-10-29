@@ -5,7 +5,6 @@ import psychlua.ModchartSprite;
 import tea.SScript;
 import backend.CoolUtil;
 
-var skewed:Bool = false;
 var draw = {
 	sprite: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
@@ -16,6 +15,49 @@ var draw = {
         }
     
         game.modchartSprites.set(tag, leSprite);
+        if(!animated) leSprite.active = true;
+	},
+	skewedsprite: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+		var leSprite:ModchartSprite = new ModchartSprite(x, y);
+        if(animated) {
+            LuaUtils.loadFrames(leSprite, image, spriteType);
+        } else if(image != null && image.length > 0) {
+            leSprite.loadGraphic(Paths.image(image));
+        }
+    
+        game.modchartSprites.set(tag, leSprite);
+		leSprite.shader = new FlxRuntimeShader('
+			//SHADERTOY PORT FIX
+			#pragma header
+			vec2 uv = openfl_TextureCoordv.xy;
+			vec2 fragCoord = openfl_TextureCoordv*openfl_TextureSize;
+			vec2 iResolution = openfl_TextureSize;
+			uniform float iTime;
+			#define iChannel0 bitmap
+			#define texture flixel_texture2D
+			#define fragColor gl_FragColor
+			#define mainImage main
+			//SHADERTOY PORT FIX
+			
+			uniform float skew = 0.0;
+			
+			
+			
+			float lerpp(float a, float b, float t){
+				return a + (b - a) * t;
+			}
+			void main(void){
+				float dfb = uv.y;
+				vec4 c = vec4(0.0,0.0,0.0,0.0);
+				vec2 pos = uv;
+				pos.x = uv.x+(skew*dfb);
+				if(pos.x > 0 && pos.x < 1){
+					gl_FragColor = flixel_texture2D( bitmap, pos);
+				}
+				
+			}
+			
+		');
         if(!animated) leSprite.active = true;
 	},
 	graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
@@ -49,9 +91,60 @@ var draw = {
 					GameOverSubstate.instance.insert(GameOverSubstate.instance.members.indexOf(GameOverSubstate.instance.boyfriend), shit);
 			}
 		}
-	}
-};
-var sprite = {
+	},
+	addAnimationByPrefix: function(obj:String, name:String, prefix:String, ?framerate:Int = 24, ?loop:Bool = true) {
+		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
+		if(obj != null && obj.animation != null)
+		{
+			obj.animation.addByPrefix(name, prefix, framerate, loop);
+			if(obj.animation.curAnim == null)
+			{
+				if(obj.playAnim != null) obj.playAnim(name, true);
+				else obj.animation.play(name, true);
+			}
+			return true;
+		}
+		return false;
+	},
+	addAnimation: function(obj:String, name:String, frames:Array, ?framerate:Int = 24, ?loop:Bool = true) {
+		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
+		if(obj != null && obj.animation != null)
+		{
+			obj.animation.add(name, frames, framerate, loop);
+			if(obj.animation.curAnim == null) {
+				obj.animation.play(name, true);
+			}
+			return true;
+		}
+		return false;
+	},
+	addAnimationByIndices: function(obj:String, name:String, prefix:String, indices:String, ?framerate:Int = 24, ?loop:Bool = false) {
+		return LuaUtils.addAnimByIndices(obj, name, prefix, indices, framerate, loop);
+	},
+	playAnim: function(obj:String, name:String, ?forced:Bool = false, ?reverse:Bool = false, ?startFrame:Int = 0)
+	{
+		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
+		if(obj.playAnim != null)
+		{
+			obj.playAnim(name, forced, reverse, startFrame);
+			return true;
+		}
+		else
+		{
+			obj.animation.play(name, forced, reverse, startFrame);
+			return true;
+		}
+		return false;
+	},
+	addOffset: function(obj:String, anim:String, x:Float, y:Float) {
+		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
+		if(obj != null && obj.addOffset != null)
+		{
+			obj.addOffset(anim, x, y);
+			return true;
+		}
+		return false;
+	},
 	scale: function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
 		if(game.getLuaObject(obj)!=null) {
 			var shit = game.getLuaObject(obj);
@@ -131,7 +224,7 @@ var sprite = {
 			object.scrollFactor.set(scrollX, scrollY);
 		}
 	}
-}
+};
 var math = {
 	lerp: function(a:Float, b:Float, t:Float) {
 		return FlxMath.lerp(a, b, t * FlxG.elapsed); // fixed lerp ig?
@@ -201,7 +294,6 @@ var system = {
 function onCreate() {
     for (fnf in SScript.global) {
 		fnf.set("draw", draw);
-		fnf.set("sprite", sprite);
 		fnf.set("math", math);
 		fnf.set("system", system);
     }
