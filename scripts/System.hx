@@ -290,12 +290,23 @@ var system = {
 	print: function(text:Dynamic = '', ?color:String = 'WHITE') {
 		debugPrint(text, color);
 	}
-}
+};
+var character = {
+	create: function(character:String, type:String) {
+		switch(type) {
+			case 'bf': game.addCharacterToList(character, 0);
+			case 'dad': game.addCharacterToList(character, 1);
+			case 'gf': game.addCharacterToList(character, 2);
+			default: game.addCharacterToList(character, 2);
+		}
+	}
+};
 function onCreate() {
     for (fnf in SScript.global) {
 		fnf.set("draw", draw);
 		fnf.set("math", math);
 		fnf.set("system", system);
+		fnf.set("character", character);
     }
 
 	game.callOnHScript('create');
