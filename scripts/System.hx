@@ -4,6 +4,7 @@ import psychlua.FunkinLua;
 import psychlua.LuaUtils;
 import psychlua.ModchartSprite;
 import tea.SScript;
+import backend.Character;
 
 var draw = {
 	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
@@ -294,10 +295,10 @@ var system = {
 var character = {
 	create: function(character:String, type:String) {
 		switch(type) {
-			case 'bf': game.addCharacterToList(character, 0);
-			case 'dad': game.addCharacterToList(character, 1);
-			case 'gf': game.addCharacterToList(character, 2);
-			default: game.addCharacterToList(character, 2);
+			case 'bf': newCharacter(character, 0);
+			case 'dad': newCharacter(character, 1);
+			case 'gf': newCharacter(character, 2);
+			default: newCharacter(character, 2);
 		}
 	}
 };
@@ -337,4 +338,36 @@ function onStepHit() {
 
 function onBeatHit() {
 	game.callOnHScript('beatHit');
+}
+
+function newCharacter(newCharacter:String, type:Int) {
+	switch(type) {
+		case 0:
+			if(!game.boyfriendMap.exists(newCharacter)) {
+				var newBoyfriend:Character = new Character(0, 0, newCharacter, true);
+				game.boyfriendMap.set(newCharacter, newBoyfriend);
+				game.boyfriendGroup.add(newBoyfriend);
+				game.startCharacterPos(newBoyfriend);
+				game.startCharacterScripts(newBoyfriend.curCharacter);
+			}
+
+		case 1:
+			if(!game.dadMap.exists(newCharacter)) {
+				var newDad:Character = new Character(0, 0, newCharacter);
+				game.dadMap.set(newCharacter, newDad);
+				game.dadGroup.add(newDad);
+				game.startCharacterPos(newDad, true);
+				game.startCharacterScripts(newDad.curCharacter);
+			}
+
+		case 2:
+			if(game.gf != null && !game.gfMap.exists(newCharacter)) {
+				var newGf:Character = new Character(0, 0, newCharacter);
+				newGf.scrollFactor.set(0.95, 0.95);
+				game.gfMap.set(newCharacter, newGf);
+				game.gfGroup.add(newGf);
+				game.startCharacterPos(newGf);
+				game.startCharacterScripts(newGf.curCharacter);
+			}
+	}
 }
