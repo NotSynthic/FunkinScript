@@ -1,10 +1,11 @@
 function create() {
-    draw.skewedsprite('hi', 'sick', 0, 0);
+    draw.skewedimage('hi', 'sick', 0, 0);
     draw.add('hi');
 }
 
 function createPost() {
     system.set('gf.visible', false);
 
-    character.create('trolljakAlert', 'dad');
+    character.create('trolljakAlert', 'gf', '', true);
+    character.create('bf', 'bf', '');
 }

@@ -6,10 +6,12 @@ import psychlua.ModchartSprite;
 import tea.SScript;
 import backend.Character;
 import haxe.ds.StringMap;
+import objects.Note;
 
 using StringTools;
 
 var characterMap = new StringMap();
+var characterNoteMap = new StringMap();
 
 var draw = {
 	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
@@ -33,38 +35,29 @@ var draw = {
     
         game.modchartSprites.set(tag, leSprite);
 		leSprite.shader = new FlxRuntimeShader('
-			//SHADERTOY PORT FIX
 			#pragma header
 			vec2 uv = openfl_TextureCoordv.xy;
 			vec2 fragCoord = openfl_TextureCoordv*openfl_TextureSize;
-			vec2 iResolution = openfl_TextureSize;
-			uniform float iTime;
 			#define iChannel0 bitmap
 			#define texture flixel_texture2D
 			#define fragColor gl_FragColor
-			#define mainImage main
-			//SHADERTOY PORT FIX
 			
 			uniform float skew = 0.0;
-			
-			
 			
 			float lerpp(float a, float b, float t){
 				return a + (b - a) * t;
 			}
-			void main(void){
+
+			void main(){
 				float dfb = uv.y;
 				vec4 c = vec4(0.0,0.0,0.0,0.0);
 				vec2 pos = uv;
 				pos.x = uv.x+(skew*dfb);
 				if(pos.x > 0 && pos.x < 1){
 					gl_FragColor = flixel_texture2D( bitmap, pos);
-				}
-				
+				}	
 			}
-			
 		');
-        if(!animated) leSprite.active = true;
 	},
 	graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
@@ -298,17 +291,20 @@ var system = {
 	}
 };
 var character = {
-	create: function(character:String, type:String) {
+	create: function(character:String, type:String, ?noteType:String = '', ?defaultGFNote:Bool = true) {
 		switch(type) {
-			case 'bf': newCharacter(character, 0);
-			case 'dad': newCharacter(character, 1);
-			case 'gf': newCharacter(character, 2);
-			default: newCharacter(character, 2);
+			case 'bf': 
+				newCharacter(character, 0, noteType);
+			case 'dad': 
+				newCharacter(character, 1, noteType);
+			case 'gf': 
+				newCharacter(character, 2, defaultGFNote ? 'GF Sing' : noteType);
+			default: 
+				newCharacter(character, 2, noteType);
 		}
 	},
 	dance: function(character:String) {
 		characterMap.get(character).dance();
-		game.callOnHScript('characterDance', [character]);
 	},
 	playAnim: function(character:String, anim:String, forced:Bool) {
 		characterMap.get(character).playAnim(anim, forced);
@@ -325,9 +321,11 @@ function onCreate() {
 	game.callOnHScript('create');
 }
 
-function onCreatePost() {
+function onMoveCamera(t)
+	game.callOnHScript('sectionCamera');
+
+function onCreatePost()
 	game.callOnHScript('createPost');
-}
 
 function onUpdate(elapsed) {
 	game.callOnHScript('update', [elapsed]);
@@ -354,18 +352,60 @@ function onBeatHit() {
 				char.dance();
 }
 
+function onCountdownTick(tick:Int, swagCounter:Int) {
+	game.callOnHScript('countdownTick', [tick, swagCounter]);
+
+	for (char in characterMap)
+		if (Std.isOfType(char, Character))
+			if (swagCounter % char.danceEveryNumBeats == 0 && char.animation.curAnim != null && !StringTools.startsWith(char.animation.curAnim.name, 'sing') && !char.stunned)
+				char.dance();
+}
+
 function opponentNoteHit(note:Note)
-	characterNote(note);
+	characterNote(note, false, false);
 
 function goodNoteHit(note:Note)
-	characterNote(note);
+	characterNote(note, true, false);
 
-function characterNote(note:Note)
+function noteMiss(note:Note)
+	characterNote(note, true, true);
+
+function noteMissPress(note:Note)
+	characterNote(note, true, true);
+
+function characterNote(note:Note, player:Bool, miss:Bool = false)
 	for (char in characterMap)
 		if (Std.isOfType(char, Character)) {
-			char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))], true);
-			char.holdTimer = 0;
+			if (characterNoteMap.get(note.noteType) == char.curCharacter)
+				if (player)
+					charSing(char, note, miss, 'bf');
+				else if (note.noteType == 'GF Sing')
+					charSing(char, note, miss, 'gf');
+				else 
+					charSing(char, note, miss, 'dad');
 		}
+
+function charSing(char:Character, note:Note, miss:Bool, charType:String) {
+	switch (charType) {
+		case 'dad':
+			if (!char.isPlayer) {
+				var missSuffix:String = miss ? 'miss' : '';
+				char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
+				char.holdTimer = 0;
+			}
+		case 'bf':
+			if (char.isPlayer) {
+				var missSuffix:String = miss ? 'miss' : '';
+				char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
+				char.holdTimer = 0;
+			}
+		case 'gf':
+			var missSuffix:String = miss ? 'miss' : '';
+			char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
+			char.holdTimer = 0;
+
+	}
+}
 
 // game.singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, note.noteData)))]
 
@@ -374,7 +414,7 @@ char.playAnim(animToPlay, true);
 char.holdTimer = 0;
 */
 
-function newCharacter(newCharacter:String, type:Int)
+function newCharacter(newCharacter:String, type:Int, ntype:String)
 	switch(type) {
 		case 0:
 			if(!game.boyfriendMap.exists(newCharacter)) {
@@ -384,6 +424,7 @@ function newCharacter(newCharacter:String, type:Int)
 				game.startCharacterPos(newBoyfriend);
 				game.startCharacterScripts(newBoyfriend.curCharacter);
 				characterMap.set(newCharacter, newBoyfriend);
+				characterNoteMap.set(ntype, newCharacter);
 			}
 
 		case 1:
@@ -394,6 +435,7 @@ function newCharacter(newCharacter:String, type:Int)
 				game.startCharacterPos(newDad, true);
 				game.startCharacterScripts(newDad.curCharacter);
 				characterMap.set(newCharacter, newDad);
+				characterNoteMap.set(ntype, newCharacter);
 			}
 
 		case 2:
@@ -405,5 +447,6 @@ function newCharacter(newCharacter:String, type:Int)
 				game.startCharacterPos(newGf);
 				game.startCharacterScripts(newGf.curCharacter);
 				characterMap.set(newCharacter, newGf);
+				characterNoteMap.set(ntype, newCharacter);
 			}
 	}
