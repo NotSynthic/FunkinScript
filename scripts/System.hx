@@ -5,6 +5,11 @@ import psychlua.LuaUtils;
 import psychlua.ModchartSprite;
 import tea.SScript;
 import backend.Character;
+import haxe.ds.StringMap;
+
+using StringTools;
+
+var characterMap = new StringMap();
 
 var draw = {
 	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
@@ -300,6 +305,13 @@ var character = {
 			case 'gf': newCharacter(character, 2);
 			default: newCharacter(character, 2);
 		}
+	},
+	dance: function(character:String) {
+		characterMap.get(character).dance();
+		game.callOnHScript('characterDance', [character]);
+	},
+	playAnim: function(character:String, anim:String, forced:Bool) {
+		characterMap.get(character).playAnim(anim, forced);
 	}
 };
 function onCreate() {
@@ -324,23 +336,45 @@ function onUpdate(elapsed) {
 	}
 }
 
-function onUpdatePost(elapsed) {
+function onUpdatePost(elapsed)
 	game.callOnHScript('updatePost', [elapsed]);
-}
 
-function onSectionHit() {
+function onSectionHit()
 	game.callOnHScript('sectionHit');
-}
 
-function onStepHit() {
+function onStepHit()
 	game.callOnHScript('stepHit');
-}
 
 function onBeatHit() {
 	game.callOnHScript('beatHit');
+
+	for (char in characterMap)
+		if (Std.isOfType(char, Character))
+			if (game.curBeat % char.danceEveryNumBeats == 0 && char.animation.curAnim != null && !StringTools.startsWith(char.animation.curAnim.name, 'sing') && !char.stunned)
+				char.dance();
 }
 
-function newCharacter(newCharacter:String, type:Int) {
+function opponentNoteHit(note:Note)
+	characterNote(note);
+
+function goodNoteHit(note:Note)
+	characterNote(note);
+
+function characterNote(note:Note)
+	for (char in characterMap)
+		if (Std.isOfType(char, Character)) {
+			char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))], true);
+			char.holdTimer = 0;
+		}
+
+// game.singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, note.noteData)))]
+
+/*
+char.playAnim(animToPlay, true);
+char.holdTimer = 0;
+*/
+
+function newCharacter(newCharacter:String, type:Int)
 	switch(type) {
 		case 0:
 			if(!game.boyfriendMap.exists(newCharacter)) {
@@ -349,6 +383,7 @@ function newCharacter(newCharacter:String, type:Int) {
 				game.boyfriendGroup.add(newBoyfriend);
 				game.startCharacterPos(newBoyfriend);
 				game.startCharacterScripts(newBoyfriend.curCharacter);
+				characterMap.set(newCharacter, newBoyfriend);
 			}
 
 		case 1:
@@ -358,6 +393,7 @@ function newCharacter(newCharacter:String, type:Int) {
 				game.dadGroup.add(newDad);
 				game.startCharacterPos(newDad, true);
 				game.startCharacterScripts(newDad.curCharacter);
+				characterMap.set(newCharacter, newDad);
 			}
 
 		case 2:
@@ -368,6 +404,6 @@ function newCharacter(newCharacter:String, type:Int) {
 				game.gfGroup.add(newGf);
 				game.startCharacterPos(newGf);
 				game.startCharacterScripts(newGf.curCharacter);
+				characterMap.set(newCharacter, newGf);
 			}
 	}
-}

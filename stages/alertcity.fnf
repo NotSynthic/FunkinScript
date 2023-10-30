@@ -5,4 +5,6 @@ function create() {
 
 function createPost() {
     system.set('gf.visible', false);
+
+    character.create('trolljakAlert', 'dad');
 }
