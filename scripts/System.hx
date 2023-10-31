@@ -12,28 +12,30 @@ using StringTools;
 
 var characterMap = new StringMap();
 var characterNoteMap = new StringMap();
+var characterTypeMap = new StringMap();
 
 var draw = {
 	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
-        if(animated) {
-            LuaUtils.loadFrames(leSprite, image, spriteType);
-        } else if(image != null && image.length > 0) {
-            leSprite.loadGraphic(Paths.image(image));
-        }
-    
-        game.modchartSprites.set(tag, leSprite);
-        if(!animated) leSprite.active = true;
+		if (animated) {
+			LuaUtils.loadFrames(leSprite, image, spriteType);
+		} else if (image != null && image.length > 0) {
+			leSprite.loadGraphic(Paths.image(image));
+		}
+
+		game.modchartSprites.set(tag, leSprite);
+		if (!animated)
+			leSprite.active = true;
 	},
 	skewedimage: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
-        if(animated) {
-            LuaUtils.loadFrames(leSprite, image, spriteType);
-        } else if(image != null && image.length > 0) {
-            leSprite.loadGraphic(Paths.image(image));
-        }
-    
-        game.modchartSprites.set(tag, leSprite);
+		if (animated) {
+			LuaUtils.loadFrames(leSprite, image, spriteType);
+		} else if (image != null && image.length > 0) {
+			leSprite.loadGraphic(Paths.image(image));
+		}
+
+		game.modchartSprites.set(tag, leSprite);
 		leSprite.shader = new FlxRuntimeShader('
 			#pragma header
 			vec2 uv = openfl_TextureCoordv.xy;
@@ -58,6 +60,7 @@ var draw = {
 				}	
 			}
 		');
+
 	},
 	graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
@@ -67,24 +70,27 @@ var draw = {
 	},
 	backdrop: function(tag:String, ?image:String = null, ?axes:String = null) {
 		var idk;
-		switch(axes) {
-			case "x": idk = 0x01;
-			case "y": idk = 0x10;
-			case "xy": idk = 0x11;
-			case null: idk = 0x11;
+		switch (axes) {
+			case "x":
+				idk = 0x01;
+			case "y":
+				idk = 0x10;
+			case "xy":
+				idk = 0x11;
+			case null:
+				idk = 0x11;
 		}
 		var spr = new FlxBackdrop(Paths.image(image), idk);
 		spr.antialiasing = ClientPrefs.data.antialiasing;
 		game.modchartSprites.set(tag, spr);
 	},
 	add: function(tag:String, ?front:Bool = false) {
-		if(game.modchartSprites.exists(tag)) {
+		if (game.modchartSprites.exists(tag)) {
 			var shit = game.modchartSprites.get(tag);
-			if(front)
+			if (front)
 				LuaUtils.getTargetInstance().add(shit);
-			else
-			{
-				if(!game.isDead)
+			else {
+				if (!game.isDead)
 					game.insert(game.members.indexOf(LuaUtils.getLowestCharacterGroup()), shit);
 				else
 					GameOverSubstate.instance.insert(GameOverSubstate.instance.members.indexOf(GameOverSubstate.instance.boyfriend), shit);
@@ -93,13 +99,13 @@ var draw = {
 	},
 	addAnimationByPrefix: function(obj:String, name:String, prefix:String, ?framerate:Int = 24, ?loop:Bool = true) {
 		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
-		if(obj != null && obj.animation != null)
-		{
+		if (obj != null && obj.animation != null) {
 			obj.animation.addByPrefix(name, prefix, framerate, loop);
-			if(obj.animation.curAnim == null)
-			{
-				if(obj.playAnim != null) obj.playAnim(name, true);
-				else obj.animation.play(name, true);
+			if (obj.animation.curAnim == null) {
+				if (obj.playAnim != null)
+					obj.playAnim(name, true);
+				else
+					obj.animation.play(name, true);
 			}
 			return true;
 		}
@@ -107,10 +113,9 @@ var draw = {
 	},
 	addAnimation: function(obj:String, name:String, frames:Array, ?framerate:Int = 24, ?loop:Bool = true) {
 		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
-		if(obj != null && obj.animation != null)
-		{
+		if (obj != null && obj.animation != null) {
 			obj.animation.add(name, frames, framerate, loop);
-			if(obj.animation.curAnim == null) {
+			if (obj.animation.curAnim == null) {
 				obj.animation.play(name, true);
 			}
 			return true;
@@ -120,16 +125,12 @@ var draw = {
 	addAnimationByIndices: function(obj:String, name:String, prefix:String, indices:String, ?framerate:Int = 24, ?loop:Bool = false) {
 		return LuaUtils.addAnimByIndices(obj, name, prefix, indices, framerate, loop);
 	},
-	playAnim: function(obj:String, name:String, ?forced:Bool = false, ?reverse:Bool = false, ?startFrame:Int = 0)
-	{
+	playAnim: function(obj:String, name:String, ?forced:Bool = false, ?reverse:Bool = false, ?startFrame:Int = 0) {
 		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
-		if(obj.playAnim != null)
-		{
+		if (obj.playAnim != null) {
 			obj.playAnim(name, forced, reverse, startFrame);
 			return true;
-		}
-		else
-		{
+		} else {
 			obj.animation.play(name, forced, reverse, startFrame);
 			return true;
 		}
@@ -137,36 +138,37 @@ var draw = {
 	},
 	addOffset: function(obj:String, anim:String, x:Float, y:Float) {
 		var obj:Dynamic = LuaUtils.getObjectDirectly(obj, false);
-		if(obj != null && obj.addOffset != null)
-		{
+		if (obj != null && obj.addOffset != null) {
 			obj.addOffset(anim, x, y);
 			return true;
 		}
 		return false;
 	},
 	scale: function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
-		if(game.getLuaObject(obj)!=null) {
+		if (game.getLuaObject(obj) != null) {
 			var shit = game.getLuaObject(obj);
 			shit.scale.set(x, y);
-			if(updateHitbox) shit.updateHitbox();
+			if (updateHitbox)
+				shit.updateHitbox();
 			return;
 		}
 
 		var split:Array<String> = obj.split('.');
 		var poop = LuaUtils.getObjectDirectly(split[0]);
-		if(split.length > 1) {
-			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length-1]);
+		if (split.length > 1) {
+			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 		}
 
-		if(poop != null) {
+		if (poop != null) {
 			poop.scale.set(x, y);
-			if(updateHitbox) poop.updateHitbox();
+			if (updateHitbox)
+				poop.updateHitbox();
 			return;
 		}
 		luaTrace('sprite.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 	},
 	velocity: function(obj:String, x:Float, y:Float) {
-		if(game.getLuaObject(obj)!=null) {
+		if (game.getLuaObject(obj) != null) {
 			var shit = game.getLuaObject(obj);
 			shit.velocity.set(x, y);
 			return;
@@ -174,11 +176,11 @@ var draw = {
 
 		var split:Array<String> = obj.split('.');
 		var poop = LuaUtils.getObjectDirectly(split[0]);
-		if(split.length > 1) {
-			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length-1]);
+		if (split.length > 1) {
+			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 		}
 
-		if(poop != null) {
+		if (poop != null) {
 			poop.velocity.set(x, y);
 			return;
 		}
@@ -187,18 +189,16 @@ var draw = {
 	screenCenter: function(obj:String, ?pos:String = 'xy') {
 		var spr = game.getLuaObject(obj);
 
-		if(spr==null){
+		if (spr == null) {
 			var split:Array<String> = obj.split('.');
 			spr = LuaUtils.getObjectDirectly(split[0]);
-			if(split.length > 1) {
-				spr = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length-1]);
+			if (split.length > 1) {
+				spr = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
 			}
 		}
 
-		if(spr != null)
-		{
-			switch(pos)
-			{
+		if (spr != null) {
+			switch (pos) {
 				case 'x':
 					spr.screenCenter(0x01);
 					return;
@@ -213,17 +213,18 @@ var draw = {
 		FunkinLua.luaTrace("sprite.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
 	},
 	scrollFactor: function(obj:String, scrollX:Float, scrollY:Float) {
-		if(game.getLuaObject(obj,false)!=null) {
-			game.getLuaObject(obj,false).scrollFactor.set(scrollX, scrollY);
+		if (game.getLuaObject(obj, false) != null) {
+			game.getLuaObject(obj, false).scrollFactor.set(scrollX, scrollY);
 			return;
 		}
 
 		var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
-		if(object != null) {
+		if (object != null) {
 			object.scrollFactor.set(scrollX, scrollY);
 		}
 	}
 };
+
 var math = {
 	lerp: function(a:Float, b:Float, t:Float) {
 		return FlxMath.lerp(a, b, t * FlxG.elapsed); // fixed lerp ig?
@@ -232,35 +233,35 @@ var math = {
 		return FlxMath.lerp(a, b, t * FlxG.elapsed); // fixed lerp ig?
 	}
 }
+
 var system = {
 	get: function(variable:String, ?allowMaps:Bool = false) {
 		var split:Array<String> = variable.split('.');
-		if(split.length > 1)
-			return LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split, true, true, allowMaps), split[split.length-1], allowMaps);
+		if (split.length > 1)
+			return LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split, true, true, allowMaps), split[split.length - 1], allowMaps);
 		return LuaUtils.getVarInArray(LuaUtils.getTargetInstance(), variable, allowMaps);
 	},
 	getFromClass: function(classVar:String, variable:String, ?allowMaps:Bool = false) {
 		var myClass:Dynamic = Type.resolveClass(classVar);
-		if(myClass == null)
-		{
+		if (myClass == null) {
 			FunkinLua.luaTrace('getFromClass: Class $classVar not found', false, false, FlxColor.RED);
 			return null;
 		}
 
 		var split:Array<String> = variable.split('.');
-		if(split.length > 1) {
+		if (split.length > 1) {
 			var obj:Dynamic = LuaUtils.getVarInArray(myClass, split[0], allowMaps);
-			for (i in 1...split.length-1)
+			for (i in 1...split.length - 1)
 				obj = LuaUtils.getVarInArray(obj, split[i], allowMaps);
 
-			return LuaUtils.getVarInArray(obj, split[split.length-1], allowMaps);
+			return LuaUtils.getVarInArray(obj, split[split.length - 1], allowMaps);
 		}
 		return LuaUtils.getVarInArray(myClass, variable, allowMaps);
 	},
 	set: function(variable:String, value:Dynamic, ?allowMaps:Bool = false) {
 		var split:Array<String> = variable.split('.');
-		if(split.length > 1) {
-			LuaUtils.setVarInArray(LuaUtils.getPropertyLoop(split, true, true, allowMaps), split[split.length-1], value, allowMaps);
+		if (split.length > 1) {
+			LuaUtils.setVarInArray(LuaUtils.getPropertyLoop(split, true, true, allowMaps), split[split.length - 1], value, allowMaps);
 			return true;
 		}
 		LuaUtils.setVarInArray(LuaUtils.getTargetInstance(), variable, value, allowMaps);
@@ -268,21 +269,20 @@ var system = {
 	},
 	setFromClass: function(classVar:String, variable:String, value:Dynamic, ?allowMaps:Bool = false) {
 		var myClass:Dynamic = Type.resolveClass(classVar);
-		if(myClass == null)
-		{
+		if (myClass == null) {
 			FunkinLua.luaTrace('setFromClass: Class $classVar not found', false, false, FlxColor.RED);
 			return null;
 		}
 
 		var split:Array<String> = variable.split('.');
-		if(split.length > 1) {
+		if (split.length > 1) {
 			var obj:Dynamic = LuaUtils.getVarInArray(myClass, split[0], allowMaps);
-			for (i in 1...split.length-1)
+			for (i in 1...split.length - 1)
 				obj = LuaUtils.getVarInArray(obj, split[i], allowMaps);
 
-			LuaUtils.setVarInArray(obj, split[split.length-1], value, allowMaps);
+			LuaUtils.setVarInArray(obj, split[split.length - 1], value, allowMaps);
 			return value;
-			}
+		}
 		LuaUtils.setVarInArray(myClass, variable, value, allowMaps);
 		return value;
 	},
@@ -290,18 +290,10 @@ var system = {
 		debugPrint(text, color);
 	}
 };
+
 var character = {
 	create: function(character:String, type:String, ?noteType:String = '', ?defaultGFNote:Bool = true) {
-		switch(type) {
-			case 'bf': 
-				newCharacter(character, 0, noteType);
-			case 'dad': 
-				newCharacter(character, 1, noteType);
-			case 'gf': 
-				newCharacter(character, 2, defaultGFNote ? 'GF Sing' : noteType);
-			default: 
-				newCharacter(character, 2, noteType);
-		}
+		newCharacter(character, type, type == 'gf' ? (defaultGFNote ? 'GF Sing' : noteType) : noteType);
 	},
 	dance: function(character:String) {
 		characterMap.get(character).dance();
@@ -310,13 +302,14 @@ var character = {
 		characterMap.get(character).playAnim(anim, forced);
 	}
 };
+
 function onCreate() {
-    for (fnf in SScript.global) {
+	for (fnf in SScript.global) {
 		fnf.set("draw", draw);
 		fnf.set("math", math);
 		fnf.set("system", system);
 		fnf.set("character", character);
-    }
+	}
 
 	game.callOnHScript('create');
 }
@@ -329,9 +322,8 @@ function onCreatePost()
 
 function onUpdate(elapsed) {
 	game.callOnHScript('update', [elapsed]);
-	for (fnf in SScript.global) {
+	for (fnf in SScript.global)
 		fnf.set("mustHit", PlayState.SONG.notes[game.curSection].mustHitSection);
-	}
 }
 
 function onUpdatePost(elapsed)
@@ -348,7 +340,10 @@ function onBeatHit() {
 
 	for (char in characterMap)
 		if (Std.isOfType(char, Character))
-			if (game.curBeat % char.danceEveryNumBeats == 0 && char.animation.curAnim != null && !StringTools.startsWith(char.animation.curAnim.name, 'sing') && !char.stunned)
+			if (game.curBeat % char.danceEveryNumBeats == 0
+				&& char.animation.curAnim != null
+				&& !StringTools.startsWith(char.animation.curAnim.name, 'sing')
+				&& !char.stunned)
 				char.dance();
 }
 
@@ -357,67 +352,40 @@ function onCountdownTick(tick:Int, swagCounter:Int) {
 
 	for (char in characterMap)
 		if (Std.isOfType(char, Character))
-			if (swagCounter % char.danceEveryNumBeats == 0 && char.animation.curAnim != null && !StringTools.startsWith(char.animation.curAnim.name, 'sing') && !char.stunned)
+			if (swagCounter % char.danceEveryNumBeats == 0
+				&& char.animation.curAnim != null
+				&& !StringTools.startsWith(char.animation.curAnim.name, 'sing')
+				&& !char.stunned)
 				char.dance();
 }
 
 function opponentNoteHit(note:Note)
-	characterNote(note, false, false);
+	characterNote(note, false);
 
 function goodNoteHit(note:Note)
-	characterNote(note, true, false);
+	characterNote(note, false);
 
 function noteMiss(note:Note)
-	characterNote(note, true, true);
+	characterNote(note, true);
 
 function noteMissPress(note:Note)
-	characterNote(note, true, true);
+	characterNote(note, true);
 
-function characterNote(note:Note, player:Bool, miss:Bool = false)
-	for (char in characterMap)
-		if (Std.isOfType(char, Character)) {
-			if (characterNoteMap.get(note.noteType) == char.curCharacter)
-				if (player)
-					charSing(char, note, miss, 'bf');
-				else if (note.noteType == 'GF Sing')
-					charSing(char, note, miss, 'gf');
-				else 
-					charSing(char, note, miss, 'dad');
-		}
+function characterNote(note:Note, ?miss:Bool = false)
+	if (characterMap.get(characterNoteMap.get(note.noteType)) != null)
+		charSing(characterMap.get(characterNoteMap.get(note.noteType)), note, miss, characterTypeMap.get(characterNoteMap.get(note.noteType)));
 
 function charSing(char:Character, note:Note, miss:Bool, charType:String) {
-	switch (charType) {
-		case 'dad':
-			if (!char.isPlayer) {
-				var missSuffix:String = miss ? 'miss' : '';
-				char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
-				char.holdTimer = 0;
-			}
-		case 'bf':
-			if (char.isPlayer) {
-				var missSuffix:String = miss ? 'miss' : '';
-				char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
-				char.holdTimer = 0;
-			}
-		case 'gf':
-			var missSuffix:String = miss ? 'miss' : '';
-			char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length-1, note.noteData)))] + missSuffix, true);
-			char.holdTimer = 0;
+	var missSuffix:String = miss ? 'miss' : '';
 
-	}
+	char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length - 1, note.noteData)))] + missSuffix, true);
+	char.holdTimer = 0;
 }
 
-// game.singAnimations[Std.int(Math.abs(Math.min(singAnimations.length-1, note.noteData)))]
-
-/*
-char.playAnim(animToPlay, true);
-char.holdTimer = 0;
-*/
-
-function newCharacter(newCharacter:String, type:Int, ntype:String)
-	switch(type) {
-		case 0:
-			if(!game.boyfriendMap.exists(newCharacter)) {
+function newCharacter(newCharacter:String, type:String, ntype:String)
+	switch (type) {
+		case 'bf':
+			if (!game.boyfriendMap.exists(newCharacter)) {
 				var newBoyfriend:Character = new Character(0, 0, newCharacter, true);
 				game.boyfriendMap.set(newCharacter, newBoyfriend);
 				game.boyfriendGroup.add(newBoyfriend);
@@ -425,10 +393,10 @@ function newCharacter(newCharacter:String, type:Int, ntype:String)
 				game.startCharacterScripts(newBoyfriend.curCharacter);
 				characterMap.set(newCharacter, newBoyfriend);
 				characterNoteMap.set(ntype, newCharacter);
+				characterTypeMap.set(newCharacter, 'bf');
 			}
-
-		case 1:
-			if(!game.dadMap.exists(newCharacter)) {
+		case 'dad':
+			if (!game.dadMap.exists(newCharacter)) {
 				var newDad:Character = new Character(0, 0, newCharacter);
 				game.dadMap.set(newCharacter, newDad);
 				game.dadGroup.add(newDad);
@@ -436,10 +404,10 @@ function newCharacter(newCharacter:String, type:Int, ntype:String)
 				game.startCharacterScripts(newDad.curCharacter);
 				characterMap.set(newCharacter, newDad);
 				characterNoteMap.set(ntype, newCharacter);
+				characterTypeMap.set(newCharacter, 'dad');
 			}
-
-		case 2:
-			if(game.gf != null && !game.gfMap.exists(newCharacter)) {
+		case 'gf':
+			if (game.gf != null && !game.gfMap.exists(newCharacter)) {
 				var newGf:Character = new Character(0, 0, newCharacter);
 				newGf.scrollFactor.set(0.95, 0.95);
 				game.gfMap.set(newCharacter, newGf);
@@ -448,5 +416,6 @@ function newCharacter(newCharacter:String, type:Int, ntype:String)
 				game.startCharacterScripts(newGf.curCharacter);
 				characterMap.set(newCharacter, newGf);
 				characterNoteMap.set(ntype, newCharacter);
+				characterTypeMap.set(newCharacter, 'gf');
 			}
 	}

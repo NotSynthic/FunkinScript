@@ -7,5 +7,5 @@ function createPost() {
     system.set('gf.visible', false);
 
     character.create('trolljakAlert', 'gf', '', true);
-    character.create('bf', 'bf', '');
+    character.create('dad', 'bf', '');
 }
