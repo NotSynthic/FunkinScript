@@ -166,7 +166,7 @@ var draw = {
 				poop.updateHitbox();
 			return;
 		}
-		luaTrace('sprite.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+		luaTrace('draw.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 	},
 	velocity: function(obj:String, x:Float, y:Float) {
 		if (game.getLuaObject(obj) != null) {
@@ -185,7 +185,7 @@ var draw = {
 			poop.velocity.set(x, y);
 			return;
 		}
-		FunkinLua.luaTrace('sprite.velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+		FunkinLua.luaTrace('draw.velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 	},
 	screenCenter: function(obj:String, ?pos:String = 'xy') {
 		var spr = game.getLuaObject(obj);
@@ -211,7 +211,7 @@ var draw = {
 					return;
 			}
 		}
-		FunkinLua.luaTrace("sprite.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+		FunkinLua.luaTrace("draw.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
 	},
 	scrollFactor: function(obj:String, scrollX:Float, scrollY:Float) {
 		if (game.getLuaObject(obj, false) != null) {
@@ -222,6 +222,42 @@ var draw = {
 		var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
 		if (object != null) {
 			object.scrollFactor.set(scrollX, scrollY);
+		}
+	},
+	addShader: function(obj:String, shader:String) {
+		if (game.getLuaObject(obj) != null) {
+			var shit = game.getLuaObject(obj);
+			shit.shader = game.createRuntimeShader(shader);
+			return;
+		}
+
+		var split:Array<String> = obj.split('.');
+		var poop = LuaUtils.getObjectDirectly(split[0]);
+		if (split.length > 1) {
+			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+		}
+
+		if (poop != null) {
+			poop.shader = game.createRuntimeShader(shader);
+			return;
+		}
+	},
+	removeShader: function(obj:String) {
+		if (game.getLuaObject(obj) != null) {
+			var shit = game.getLuaObject(obj);
+			shit.shader = null;
+			return;
+		}
+
+		var split:Array<String> = obj.split('.');
+		var poop = LuaUtils.getObjectDirectly(split[0]);
+		if (split.length > 1) {
+			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
+		}
+
+		if (poop != null) {
+			poop.shader = null;
+			return;
 		}
 	}
 };
