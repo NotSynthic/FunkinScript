@@ -15,7 +15,7 @@ var characterMap = new StringMap();
 var characterNoteMap = new StringMap();
 var characterTypeMap = new StringMap();
 
-var draw = {
+var sprite = {
 	image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
 		if (animated) {
@@ -341,7 +341,7 @@ var character = {
 };
 
 var libs = [
-	"draw" => draw,
+	"sprite" => sprite,
 	"math" => math,
 	"system" => system,
 	"character" => character
