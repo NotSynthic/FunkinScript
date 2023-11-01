@@ -224,40 +224,37 @@ var sprite = {
 			object.scrollFactor.set(scrollX, scrollY);
 		}
 	},
+	antialiasing: function(obj:String, check:Bool) {
+		if (game.getLuaObject(obj) != null) {
+			game.getLuaObject(obj).antialiasing = check;
+			return;
+		}
+
+		var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+		if (object != null) {
+			object.antialiasing = check;
+		}
+	},
 	addShader: function(obj:String, shader:String) {
 		if (game.getLuaObject(obj) != null) {
-			var shit = game.getLuaObject(obj);
-			shit.shader = game.createRuntimeShader(shader);
+			game.getLuaObject(obj).shader = game.createRuntimeShader(shader);
 			return;
 		}
 
-		var split:Array<String> = obj.split('.');
-		var poop = LuaUtils.getObjectDirectly(split[0]);
-		if (split.length > 1) {
-			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
-		}
-
-		if (poop != null) {
-			poop.shader = game.createRuntimeShader(shader);
-			return;
+		var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+		if (object != null) {
+			object.shader = game.createRuntimeShader(shader);
 		}
 	},
 	removeShader: function(obj:String) {
 		if (game.getLuaObject(obj) != null) {
-			var shit = game.getLuaObject(obj);
-			shit.shader = null;
+			game.getLuaObject(obj).shader = null;
 			return;
 		}
 
-		var split:Array<String> = obj.split('.');
-		var poop = LuaUtils.getObjectDirectly(split[0]);
-		if (split.length > 1) {
-			poop = LuaUtils.getVarInArray(LuaUtils.getPropertyLoop(split), split[split.length - 1]);
-		}
-
-		if (poop != null) {
-			poop.shader = null;
-			return;
+		var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+		if (object != null) {
+			object.shader = null;
 		}
 	}
 };
