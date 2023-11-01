@@ -28,7 +28,7 @@ var sprite = {
 		if (!animated)
 			leSprite.active = true;
 	},
-	skewedimage: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
+	skewedImage: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
 		var leSprite:ModchartSprite = new ModchartSprite(x, y);
 		if (animated) {
 			LuaUtils.loadFrames(leSprite, image, spriteType);
