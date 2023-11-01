@@ -166,7 +166,7 @@ var sprite = {
 				poop.updateHitbox();
 			return;
 		}
-		luaTrace('draw.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+		luaTrace('sprite.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 	},
 	velocity: function(obj:String, x:Float, y:Float) {
 		if (game.getLuaObject(obj) != null) {
@@ -185,7 +185,7 @@ var sprite = {
 			poop.velocity.set(x, y);
 			return;
 		}
-		FunkinLua.luaTrace('draw.velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
+		FunkinLua.luaTrace('sprite.velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 	},
 	screenCenter: function(obj:String, ?pos:String = 'xy') {
 		var spr = game.getLuaObject(obj);
@@ -211,7 +211,7 @@ var sprite = {
 					return;
 			}
 		}
-		FunkinLua.luaTrace("draw.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
+		FunkinLua.luaTrace("sprite.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
 	},
 	scrollFactor: function(obj:String, scrollX:Float, scrollY:Float) {
 		if (game.getLuaObject(obj, false) != null) {
