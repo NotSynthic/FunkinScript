@@ -6,6 +6,7 @@ import psychlua.ModchartSprite;
 import tea.SScript;
 import backend.Character;
 import haxe.ds.StringMap;
+import haxe.ds.Map;
 import objects.Note;
 
 using StringTools;
@@ -303,12 +304,19 @@ var character = {
 	}
 };
 
+var libs = [
+	"draw" => draw,
+	"math" => math,
+	"system" => system,
+	"character" => character
+];
+
 function onCreate() {
 	for (fnf in SScript.global) {
-		fnf.set("draw", draw);
-		fnf.set("math", math);
-		fnf.set("system", system);
-		fnf.set("character", character);
+		for (k in libs.keys()) {
+			var e = libs.get(k);
+			fnf.set(k,e);
+		}
 	}
 
 	game.callOnHScript('create');
