@@ -1,13 +1,6 @@
-var libs = [
-	"draw" => 0,
-	"math" => 1,
-	"system" => 2,
-	"character" => 3
-];
-
 function create() {
-    draw.skewedimage('hi', 'sick', 0, 0);
-    draw.add('hi');
+    sprite.skewedimage('hi', 'sick', 0, 0);
+    sprite.add('hi');
 }
 
 function createPost() {
@@ -15,6 +8,4 @@ function createPost() {
 
     character.create('trolljakAlert', 'gf', '', true);
     character.create('dad', 'bf', '');
-
-    system.print(libs);
 }
