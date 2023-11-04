@@ -9,17 +9,19 @@ import haxe.ds.StringMap;
 import haxe.ds.Map;
 import objects.Note;
 import backend.Mods;
-
+import flixel.util.FlxSpriteUtil;
+import flixel.math.FlxBasePoint;
+import Reflect;
+import Std;
 
 using StringTools;
 
 var scriptFolders = [Paths.modFolders('scripts'), Paths.modFolders('data/'+game.songName), Paths.modFolders('stages')];
-
 for (path in scriptFolders) {
 	var scriptPath = FileSystem.readDirectory(path);
 	if (scriptPath != null) {
 		for (file in scriptPath) {
-			if (StringTools.endsWith(file, ".fnf")) {
+			if (StringTools.endsWith(file, ".fs")) {
 				var characterMap = new StringMap();
 				var characterNoteMap = new StringMap();
 				var characterTypeMap = new StringMap();
@@ -94,6 +96,18 @@ for (path in scriptFolders) {
 						spr.antialiasing = ClientPrefs.data.antialiasing;
 						game.modchartSprites.set(tag, spr);
 					},
+					polygon: function(obj:String, vertices:Array) {
+						if (getFnfObject(obj) != null) {
+							var shit = getFnfObject(obj);
+							FlxSpriteUtil.drawPolygon(shit, vertices);
+							return;
+						}
+
+						var object = Reflect.getProperty(LuaUtils.getTargetInstance(), obj);
+						if (object != null) {
+							FlxSpriteUtil.drawPolygon(object, vertices);
+						}
+					},
 					add: function(tag:String, ?front:Bool = false) {
 						if (game.modchartSprites.exists(tag)) {
 							var shit = game.modchartSprites.get(tag);
@@ -155,8 +169,8 @@ for (path in scriptFolders) {
 						return false;
 					},
 					scale: function(obj:String, x:Float, y:Float, ?updateHitbox:Bool = true) {
-						if (game.getLuaObject(obj) != null) {
-							var shit = game.getLuaObject(obj);
+						if (getFnfObject(obj) != null) {
+							var shit = getFnfObject(obj);
 							shit.scale.set(x, y);
 							if (updateHitbox)
 								shit.updateHitbox();
@@ -178,8 +192,8 @@ for (path in scriptFolders) {
 						luaTrace('sprite.scale: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 					},
 					velocity: function(obj:String, x:Float, y:Float) {
-						if (game.getLuaObject(obj) != null) {
-							var shit = game.getLuaObject(obj);
+						if (getFnfObject(obj) != null) {
+							var shit = getFnfObject(obj);
 							shit.velocity.set(x, y);
 							return;
 						}
@@ -197,7 +211,7 @@ for (path in scriptFolders) {
 						FunkinLua.luaTrace('sprite.velocity: Couldnt find object: ' + obj, false, false, FlxColor.RED);
 					},
 					screenCenter: function(obj:String, ?pos:String = 'xy') {
-						var spr = game.getLuaObject(obj);
+						var spr = getFnfObject(obj);
 
 						if (spr == null) {
 							var split:Array<String> = obj.split('.');
@@ -223,8 +237,8 @@ for (path in scriptFolders) {
 						FunkinLua.luaTrace("sprite.screenCenter: Object " + obj + " doesn't exist!", false, false, FlxColor.RED);
 					},
 					scrollFactor: function(obj:String, scrollX:Float, scrollY:Float) {
-						if (game.getLuaObject(obj, false) != null) {
-							game.getLuaObject(obj, false).scrollFactor.set(scrollX, scrollY);
+						if (getFnfObject(obj, false) != null) {
+							getFnfObject(obj, false).scrollFactor.set(scrollX, scrollY);
 							return;
 						}
 
@@ -234,8 +248,8 @@ for (path in scriptFolders) {
 						}
 					},
 					antialiasing: function(obj:String, check:Bool) {
-						if (game.getLuaObject(obj) != null) {
-							game.getLuaObject(obj).antialiasing = check;
+						if (getFnfObject(obj) != null) {
+							getFnfObject(obj).antialiasing = check;
 							return;
 						}
 
@@ -245,8 +259,8 @@ for (path in scriptFolders) {
 						}
 					},
 					addShader: function(obj:String, shader:String) {
-						if (game.getLuaObject(obj) != null) {
-							game.getLuaObject(obj).shader = game.createRuntimeShader(shader);
+						if (getFnfObject(obj) != null) {
+							getFnfObject(obj).shader = game.createRuntimeShader(shader);
 							return;
 						}
 
@@ -256,8 +270,8 @@ for (path in scriptFolders) {
 						}
 					},
 					removeShader: function(obj:String) {
-						if (game.getLuaObject(obj) != null) {
-							game.getLuaObject(obj).shader = null;
+						if (getFnfObject(obj) != null) {
+							getFnfObject(obj).shader = null;
 							return;
 						}
 
@@ -430,6 +444,13 @@ for (path in scriptFolders) {
 
 					char.playAnim(game.singAnimations[Std.int(Math.abs(Math.min(game.singAnimations.length - 1, note.noteData)))] + missSuffix, true);
 					char.holdTimer = 0;
+				}
+
+				//just getLuaObject but we can add more shit
+				function getFnfObject(tag:String, ?text:Bool=true) {
+					if(game.modchartSprites.exists(tag)) return game.modchartSprites.get(tag);
+					if(text && game.modchartTexts.exists(tag)) return game.modchartTexts.get(tag);
+					if(game.variables.exists(tag)) return game.variables.get(tag);
 				}
 
 				function newCharacter(newCharacter:String, type:String, ntype:String)
