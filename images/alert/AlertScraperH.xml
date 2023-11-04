@@ -1,4 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<TextureAtlas imagePath="AlertScraperH.png"><SubTexture name="AlertScraperH int0000" x="0" y="0" width="299" height="478" frameX="0" frameY="0" frameWidth="299" frameHeight="478" />
-<SubTexture name="AlertScraperH dest0000" x="0" y="478" width="299" height="478" frameX="0" frameY="0" frameWidth="299" frameHeight="478" />
-</TextureAtlas>

@@ -1,18 +1,20 @@
+import backend.Character;
 import backend.CoolUtil;
+import backend.Mods;
 import flixel.addons.display.FlxBackdrop;
 import psychlua.FunkinLua;
 import psychlua.LuaUtils;
 import psychlua.ModchartSprite;
 import tea.SScript;
-import backend.Character;
 import haxe.ds.StringMap;
 import haxe.ds.Map;
-import objects.Note;
-import backend.Mods;
+import haxe.format.JsonParser;
 import flixel.util.FlxSpriteUtil;
 import flixel.math.FlxBasePoint;
+import objects.Note;
 import Reflect;
 import Std;
+import Type;
 
 using StringTools;
 
@@ -74,7 +76,7 @@ for (path in scriptFolders) {
 						');
 
 					},
-					graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, color:String = 'FFFFFF') {
+					graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, ?color:String = 'FFFFFF') {
 						var leSprite:ModchartSprite = new ModchartSprite(x, y);
 						leSprite.makeGraphic(width, height, CoolUtil.colorFromString(color));
 						game.modchartSprites.set(tag, leSprite);
@@ -364,14 +366,15 @@ for (path in scriptFolders) {
 					"sprite" => sprite,
 					"math" => math,
 					"system" => system,
-					"character" => character
+					"character" => character,
+					"screenWidth" => FlxG.width,
+					"screenHeight" => FlxG.height
 				];
 
 				function onCreate() {
 					for (fnf in SScript.global) {
 						for (k in libs.keys()) {
-							var e = libs.get(k);
-							fnf.set(k,e);
+							fnf.set(k,libs[k]);
 						}
 					}
 

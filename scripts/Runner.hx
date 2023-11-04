@@ -1,5 +1,6 @@
-import psychlua.HScript;
 import backend.Mods;
+import psychlua.HScript;
+import tjson.TJSON as Json;
 
 function onCreate() {
     // GLOBAL SCRIPTS
@@ -16,4 +17,15 @@ function onCreate() {
 	for (folder in songFolders)
 		for (file in FileSystem.readDirectory(folder))
 			if(StringTools.endsWith(file, ".fs")) game.initHScript(folder + file);
+}
+
+var stageJson:Dynamic = null;
+function onUpdatePost(elapsed) {
+	stageJson = cast Json.parse(Paths.getTextFromFile('stages/' + PlayState.curStage + '.json'));
+	if(stageJson != null && stageJson.zoomFactors != null) {
+		if(mustHit)
+			game.defaultCamZoom = stageJson.zoomFactors.boyfriend;
+		else
+			game.defaultCamZoom = stageJson.zoomFactors.opponent;
+	}
 }
