@@ -21,7 +21,7 @@ function onCreate() {
 
 var stageJson:Dynamic = null;
 function onUpdatePost(elapsed) {
-	stageJson = cast Json.parse(Paths.getTextFromFile('stages/' + PlayState.curStage + '.json'));
+	stageJson = Json.parse(Paths.getTextFromFile('stages/' + PlayState.curStage + '.json'));
 	if(stageJson != null && stageJson.zoomFactors != null) {
 		if(mustHit)
 			game.defaultCamZoom = stageJson.zoomFactors.boyfriend;
