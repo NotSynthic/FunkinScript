@@ -10,7 +10,7 @@ import haxe.ds.StringMap;
 import haxe.ds.Map;
 import haxe.format.JsonParser;
 import flixel.util.FlxSpriteUtil;
-import flixel.math.FlxBasePoint;
+import flixel.math.FlxBasePoint as FlxPoint;
 import objects.Note;
 import Reflect;
 import Std;
