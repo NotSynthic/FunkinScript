@@ -372,14 +372,6 @@ for (path in scriptFolders) {
 				];
 
 				function onCreate() {
-					var scripts:Array<SScript> = SScript.global.getScripts();
-					var filteredScripts:Array<SScript> = [];
-					for (script in scripts) {
-						var fileName:String = script.getFileName();
-						if (fileName.endsWith(".fs")) {
-							filteredScripts.push(script);
-						}
-					}
 					for (fnf in SScript.global) {
 						for (k in libs.keys()) {
 							fnf.set(k,libs[k]);
