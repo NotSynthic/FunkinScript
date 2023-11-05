@@ -1,6 +1,7 @@
 import backend.Mods;
 import psychlua.HScript;
 import tjson.TJSON as Json;
+import tea.SScript;
 
 function onCreate() {
     // GLOBAL SCRIPTS
@@ -22,10 +23,6 @@ function onCreate() {
 var stageJson:Dynamic = null;
 function onUpdatePost(elapsed) {
 	stageJson = Json.parse(Paths.getTextFromFile('stages/' + PlayState.curStage + '.json'));
-	if(stageJson != null && stageJson.zoomFactors != null) {
-		if(mustHit)
-			game.defaultCamZoom = stageJson.zoomFactors.boyfriend;
-		else
-			game.defaultCamZoom = stageJson.zoomFactors.opponent;
-	}
+	if(stageJson != null && stageJson.zoomFactors != null) game.defaultCamZoom = mustHit ? stageJson.zoomFactors.boyfriend : stageJson.zoomFactors.opponent;
+	debugPrint(SScript.global);
 }
