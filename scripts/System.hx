@@ -373,13 +373,10 @@ for (path in scriptFolders) {
 
 				var fsScriptMap = SScript.global;
 				function onCreate() {
-					for (fnf in SScript.global.keys()) {
-						var fileName:String = fnf.substring(fnf.lastIndexOf("/") + 1);
-						if (StringTools.endsWith(fileName, ".hx")) fsScriptMap.remove(fnf);
-					}
-					for (fs in fsScriptMap) {
+					for (fnf in SScript.global.keys()) 
+						if (StringTools.endsWith(fnf, ".hx")) fsScriptMap.remove(fnf);
+					for (fs in fsScriptMap)
 						for (k in libs.keys()) fs.set(k, libs[k]);
-					}
 
 					game.callOnHScript('create');
 				}
