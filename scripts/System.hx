@@ -371,11 +371,14 @@ for (path in scriptFolders) {
 					"screenHeight" => FlxG.height
 				];
 
+				var fsScriptMap = SScript.global;
 				function onCreate() {
-					for (fnf in SScript.global) {
-						for (k in libs.keys()) {
-							fnf.set(k,libs[k]);
-						}
+					for (fnf in SScript.global.keys()) {
+						var fileName:String = fnf.substring(fnf.lastIndexOf("/") + 1);
+						if (StringTools.endsWith(fileName, ".hx")) fsScriptMap.remove(fnf);
+					}
+					for (fs in fsScriptMap) {
+						for (k in libs.keys()) fs.set(k, libs[k]);
 					}
 
 					game.callOnHScript('create');
@@ -389,7 +392,7 @@ for (path in scriptFolders) {
 
 				function onUpdate(elapsed) {
 					game.callOnHScript('update', [elapsed]);
-					for (fnf in SScript.global)
+					for (fnf in fsScriptMap)
 						fnf.set("mustHit", PlayState.SONG.notes[game.curSection].mustHitSection);
 				}
 
