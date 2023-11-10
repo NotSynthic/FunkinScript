@@ -17,7 +17,7 @@ import Std;
 import Type;
 
 using StringTools;
-
+//PERSPECTIVE SPRITE CODE BY CYN, PORTED BY SEMI
 var scriptFolders = [Paths.modFolders('scripts'), Paths.modFolders('data/'+game.songName), Paths.modFolders('stages')];
 for (path in scriptFolders) {
 	var scriptPath = FileSystem.readDirectory(path);
@@ -27,6 +27,11 @@ for (path in scriptFolders) {
 				var characterMap = new StringMap();
 				var characterNoteMap = new StringMap();
 				var characterTypeMap = new StringMap();
+
+				var perspectiveSprite = ["yea" => "bitch"];
+				var perspective_vanish_offset = {x: 0, y: 0};
+
+				perspectiveSprite.remove("yea"); //dont worry about it
 
 				var sprite = {
 					image: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
@@ -40,41 +45,6 @@ for (path in scriptFolders) {
 						game.modchartSprites.set(tag, leSprite);
 						if (!animated)
 							leSprite.active = true;
-					},
-					skewedImage: function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?animated:String = false, ?spriteType:String = "sparrow") {
-						var leSprite:ModchartSprite = new ModchartSprite(x, y);
-						if (animated) {
-							LuaUtils.loadFrames(leSprite, image, spriteType);
-						} else if (image != null && image.length > 0) {
-							leSprite.loadGraphic(Paths.image(image));
-						}
-
-						game.modchartSprites.set(tag, leSprite);
-						leSprite.shader = new FlxRuntimeShader('
-							#pragma header
-							vec2 uv = openfl_TextureCoordv.xy;
-							vec2 fragCoord = openfl_TextureCoordv*openfl_TextureSize;
-							#define iChannel0 bitmap
-							#define texture flixel_texture2D
-							#define fragColor gl_FragColor
-							
-							uniform float skew = 0.0;
-							
-							float lerpp(float a, float b, float t){
-								return a + (b - a) * t;
-							}
-
-							void main(){
-								float dfb = uv.y;
-								vec4 c = vec4(0.0,0.0,0.0,0.0);
-								vec2 pos = uv;
-								pos.x = uv.x+(skew*dfb);
-								if(pos.x > 0 && pos.x < 1){
-									gl_FragColor = flixel_texture2D( bitmap, pos);
-								}	
-							}
-						');
-
 					},
 					graphic: function(tag:String, width:Int = 256, height:Int = 256, ?x:Float = 0, ?y:Float = 0, ?color:String = 'FFFFFF') {
 						var leSprite:ModchartSprite = new ModchartSprite(x, y);
@@ -260,6 +230,69 @@ for (path in scriptFolders) {
 							object.antialiasing = check;
 						}
 					},
+					addPerspective: function(obj:String, depth:Float) {
+						if(perspectiveSprite.exists(obj)) {
+							perspectiveSprite.get(obj).depth = depth;
+						} else {
+							var shit = {
+								x: getFnfObject(obj).x,
+								y: getFnfObject(obj).y,
+								width: getFnfObject(obj).width,
+								height: getFnfObject(obj).height,
+								scale: {x: getFnfObject(obj).scale.x, y: getFnfObject(obj).scale.y},
+								depth:  depth
+							};
+							perspectiveSprite.set(obj, shit);
+
+							getFnfObject(obj).shader = new FlxRuntimeShader('
+								#pragma header
+
+								uniform vec2 u_top;
+
+								void main() {
+									vec2 uv = vec2(openfl_TextureCoordv.x, 1.0 - openfl_TextureCoordv.y);
+									
+									vec2 bottom = vec2(0.0, 1.0), top = u_top;
+									if (top.y > 1.0) {
+										top.x /= top.y;
+										bottom.y /= top.y;
+										
+										top.y = 1.0;
+									} else if (top.x < 0.0) {
+										top.x = 1.0 - top.x;
+										
+										top.y = 1.0 - (1.0 - top.y) / top.x;
+										bottom.x = 1.0 - (1.0 - bottom.x) / top.x;
+										
+										top.x = 0.0;
+									}
+									
+									vec2 side = mix(bottom, top, uv.y);
+									uv = vec2((uv.x - side.x) / (side.y - side.x), 1.0 - uv.y);
+									
+									gl_FragColor = (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) ? vec4(0.0) : flixel_texture2D(bitmap, uv);
+								}
+							');
+							getFnfObject(obj).shader.setFloatArray('u_top', [0, 10]);
+							getFnfObject(obj).shader.setFloat('u_depth', depth);
+						}
+					},
+					removePerspective: function(obj:String) {
+						var sprite = perspectiveSprite.get(obj);
+						if(perspectiveSprite.exists(obj)) {
+							getFnfObject(obj).scale.set(sprite.scale.x, sprite.scale.y);
+							getFnfObject(obj).updateHitbox();
+							getFnfObject(obj).x = sprite.x;
+							getFnfObject(obj).y = sprite.y;
+							getFnfObject(obj).shader = null;
+
+							perspectiveSprite.remove(obj);
+						}
+					},
+					vanishOffset: function(x:Float, y:Float) {
+						perspective_vanish_offset.x = x;
+						perspective_vanish_offset.y = y;
+					},
 					addShader: function(obj:String, shader:String) {
 						if (getFnfObject(obj) != null) {
 							getFnfObject(obj).shader = game.createRuntimeShader(shader);
@@ -393,8 +426,28 @@ for (path in scriptFolders) {
 						fnf.set("mustHit", PlayState.SONG.notes[game.curSection].mustHitSection);
 				}
 
-				function onUpdatePost(elapsed)
+				function onUpdatePost(elapsed) {
 					game.callOnHScript('updatePost', [elapsed]);
+					var cam = {x: game.camGame.scroll.x + FlxG.width / 2 + perspective_vanish_offset.x, y: game.camGame.scroll.y + FlxG.height / 2 + perspective_vanish_offset.y};
+					for(tag in perspectiveSprite.keys()) {
+						var sprite = perspectiveSprite.get(tag);
+						var vanish = {x: (cam.x - sprite.x) / sprite.width, y: 1 - (cam.y - sprite.y) / sprite.height};
+						var top = [sprite.depth * vanish.x, sprite.depth * (vanish.x - 1) + 1];
+						if(top[1]>1) {
+							getFnfObject(tag).scale.set(sprite.scale.x * (1 + sprite.depth * (vanish.x - 1)), sprite.scale.y * (sprite.depth * vanish.y));
+							getFnfObject(tag).updateHitbox();
+						} else if(top[0]<0) {
+							getFnfObject(tag).scale.set(sprite.scale.x * (1 - sprite.depth * (vanish.x)), sprite.scale.y * (sprite.depth * vanish.y));
+							getFnfObject(tag).updateHitbox();
+							getFnfObject(tag).x = sprite.x + sprite.width * sprite.depth * vanish.x;
+						} else {
+							getFnfObject(tag).scale.set(sprite.scale.x, sprite.scale.y * (sprite.depth * vanish.y));
+							getFnfObject(tag).updateHitbox();
+						}
+						getFnfObject(tag).y = sprite.y + sprite.height * (1 - sprite.depth * Math.max(vanish.y, 0));
+						getFnfObject(tag).shader.setFloatArray('u_top', top);
+					}
+				}
 
 				function onSectionHit()
 					game.callOnHScript('sectionHit');
