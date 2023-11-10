@@ -12,8 +12,10 @@ import haxe.format.JsonParser;
 import flixel.util.FlxSpriteUtil;
 import flixel.math.FlxBasePoint as FlxPoint;
 import objects.Note;
+import psychlua.HScript;
 import Reflect;
 import Std;
+import tjson.TJSON as Json;
 import Type;
 
 using StringTools;
@@ -411,6 +413,21 @@ for (path in scriptFolders) {
 					for (fs in fsScriptMap)
 						for (k in libs.keys()) fs.set(k, libs[k]);
 
+					// GLOBAL SCRIPTS
+					var globalFolders:Array = Mods.directoriesWithFile(Paths.getPreloadPath(), 'scripts/');
+					for (folder in globalFolders)
+						for (file in FileSystem.readDirectory(folder))
+							if(StringTools.endsWith(file, ".fs")) game.initHScript(folder + file);
+
+					// STAGE SCRIPTS
+					game.startHScriptsNamed('stages/' + PlayState.curStage + '.fs');
+
+					// SONG SCRIPTS
+					var songFolders:Array<String> = Mods.directoriesWithFile(Paths.getPreloadPath(), 'data/' + game.songName + '/');
+					for (folder in songFolders)
+						for (file in FileSystem.readDirectory(folder))
+							if(StringTools.endsWith(file, ".fs")) game.initHScript(folder + file);
+
 					game.callOnHScript('create');
 				}
 
@@ -421,13 +438,12 @@ for (path in scriptFolders) {
 					game.callOnHScript('createPost');
 
 				function onUpdate(elapsed) {
-					game.callOnHScript('update', [elapsed]);
 					for (fnf in fsScriptMap)
 						fnf.set("mustHit", PlayState.SONG.notes[game.curSection].mustHitSection);
+					game.callOnHScript('update', [elapsed]);
 				}
 
 				function onUpdatePost(elapsed) {
-					game.callOnHScript('updatePost', [elapsed]);
 					var cam = {x: game.camGame.scroll.x + FlxG.width / 2 + perspective_vanish_offset.x, y: game.camGame.scroll.y + FlxG.height / 2 + perspective_vanish_offset.y};
 					for(tag in perspectiveSprite.keys()) {
 						var sprite = perspectiveSprite.get(tag);
@@ -447,6 +463,7 @@ for (path in scriptFolders) {
 						getFnfObject(tag).y = sprite.y + sprite.height * (1 - sprite.depth * Math.max(vanish.y, 0));
 						getFnfObject(tag).shader.setFloatArray('u_top', top);
 					}
+					game.callOnHScript('updatePost', [elapsed]);
 				}
 
 				function onSectionHit()
@@ -456,8 +473,6 @@ for (path in scriptFolders) {
 					game.callOnHScript('stepHit');
 
 				function onBeatHit() {
-					game.callOnHScript('beatHit');
-
 					for (char in characterMap)
 						if (Std.isOfType(char, Character))
 							if (game.curBeat % char.danceEveryNumBeats == 0
@@ -465,11 +480,11 @@ for (path in scriptFolders) {
 								&& !StringTools.startsWith(char.animation.curAnim.name, 'sing')
 								&& !char.stunned)
 								char.dance();
+
+					game.callOnHScript('beatHit');
 				}
 
 				function onCountdownTick(tick:Int, swagCounter:Int) {
-					game.callOnHScript('countdownTick', [tick, swagCounter]);
-
 					for (char in characterMap)
 						if (Std.isOfType(char, Character))
 							if (swagCounter % char.danceEveryNumBeats == 0
@@ -477,6 +492,7 @@ for (path in scriptFolders) {
 								&& !StringTools.startsWith(char.animation.curAnim.name, 'sing')
 								&& !char.stunned)
 								char.dance();
+					game.callOnHScript('countdownTick', [tick, swagCounter]);
 				}
 
 				function opponentNoteHit(note:Note)
